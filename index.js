@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -25,10 +25,31 @@ async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
         await client.connect();
-        const toyCarCollection=client.db('ToyCarDB').collection('ShopCategory');
+        const toyCarCollection = client.db('ToyCarDB').collection('ShopCategory');
+        const AllToyCarCollection = client.db('ToyCarDB').collection('AllToyDB');
 
-        app.get('/ShopCategory',async(req,res)=>{
-            const result=await toyCarCollection.find().toArray();
+        app.get('/ShopCategory/:text', async (req, res) => {
+            const text = req.params.text;
+            if (text == "Sports Car" || text == "Police Car" || text == "Truck") {
+                const result = await toyCarCollection.find({ category: text }).toArray();
+                return res.send(result);
+
+            }
+
+            const result = await toyCarCollection.find({}).toArray();
+            res.send(result);
+        })
+
+        app.get('/singleToy/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await toyCarCollection.findOne(query);
+            res.send(result);
+        })
+
+        app.post('/allToy',async (req,res)=>{
+            const  toy=req.body;
+            const result=await AllToyCarCollection.insertOne(toy);
             res.send(result);
         })
 
