@@ -47,12 +47,26 @@ async function run() {
             res.send(result);
         })
 
-        app.post('/allToy',async (req,res)=>{
-            const  toy=req.body;
-            const result=await AllToyCarCollection.insertOne(toy);
+        // All toy car Collection
+
+
+
+        app.post('/allToy', async (req, res) => {
+            const toy = req.body;
+            const result = await AllToyCarCollection.insertOne(toy);
             res.send(result);
         })
 
+        app.get('/allToy', async (req, res) => {
+            const result = await AllToyCarCollection.find().toArray();
+            res.send(result);
+        })
+        app.get('/allToy/:id', async (req, res) => {
+            const id=req.params.id;
+            const query={_id : new ObjectId(id)}
+            const result = await AllToyCarCollection.findOne(query);
+            res.send(result);
+        })
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
