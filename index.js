@@ -78,12 +78,45 @@ async function run() {
             const result = await AllToyCarCollection.findOne(query);
             res.send(result);
         })
-        // Delete method
-        app.delete('/allToy/:id', async(req,res)=>{
-            const id=req.params.id;
-            const query={_id: new ObjectId(id)}
-            const result= await AllToyCarCollection.deleteOne(query);
+        // search api
+
+        app.get('/allToy/:id', async (req, res) => {
+            const searchText = req.params.id;
+            const result = await AllToyCarCollection.find({
+                $or: [
+                    { title: { $regex: searchText, $options: "i" } },
+                    
+                  ],
+            }).toArray();
+
             res.send(result);
+        })
+
+
+        // Delete method
+        app.delete('/allToy/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await AllToyCarCollection.deleteOne(query);
+            res.send(result);
+        })
+
+        // update method
+
+        app.put('/allToy/:id', async (req, res) => {
+            const id = req.params.id;
+            const updateToy = req.body;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    price: updateToy.price,
+                    quantity: updateToy.quantity,
+                    description: updateToy.description
+                },
+            };
+            const result = await AllToyCarCollection.updateOne(filter, updateDoc, options);
+            res.send(result)
         })
 
         // Send a ping to confirm a successful connection
