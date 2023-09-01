@@ -27,6 +27,7 @@ async function run() {
         await client.connect();
         const toyCarCollection = client.db('ToyCarDB').collection('ShopCategory');
         const AllToyCarCollection = client.db('ToyCarDB').collection('AllToyDB');
+        const ReviewCollection = client.db('ToyCarDB').collection('reviews');
 
         app.get('/ShopCategory/:text', async (req, res) => {
             const text = req.params.text;
@@ -85,8 +86,8 @@ async function run() {
             const result = await AllToyCarCollection.find({
                 $or: [
                     { title: { $regex: searchText, $options: "i" } },
-                    
-                  ],
+
+                ],
             }).toArray();
 
             res.send(result);
@@ -117,6 +118,12 @@ async function run() {
             };
             const result = await AllToyCarCollection.updateOne(filter, updateDoc, options);
             res.send(result)
+        })
+
+        // reviews
+        app.get('/reviews', async (req, res) => {
+            const result = await ReviewCollection.find().toArray();
+            return res.send(result)
         })
 
         // Send a ping to confirm a successful connection
